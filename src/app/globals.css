@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
+/* ========================================
+   Toss Design System (TDS) — CSS Tokens
+   ======================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background */
+  --tds-bg-primary:    oklch(1.000 0.000 0);
+  --tds-bg-secondary:  oklch(0.957 0.005 247);
+  --tds-bg-tertiary:   oklch(0.932 0.008 247);
+  --tds-bg-brand:      oklch(0.624 0.176 254);
+  --tds-bg-brand-weak: oklch(0.936 0.041 255);
+
+  /* Foreground */
+  --tds-fg-primary:    oklch(0.234 0.030 254);
+  --tds-fg-secondary:  oklch(0.452 0.028 253);
+  --tds-fg-tertiary:   oklch(0.590 0.022 255);
+  --tds-fg-placeholder:oklch(0.736 0.015 252);
+  --tds-fg-disabled:   oklch(0.821 0.010 250);
+  --tds-fg-alt:        oklch(1.000 0.000 0);
+  --tds-fg-brand:      oklch(0.624 0.176 254);
+  --tds-fg-danger:     oklch(0.628 0.221  29);
+
+  /* Line / Border */
+  --tds-line-default:  oklch(0.913 0.008 247);
+  --tds-line-strong:   oklch(0.821 0.010 250);
+  --tds-line-focus:    oklch(0.624 0.176 254);
+
+  /* Elevation / Shadow */
+  --tds-shadow-card:   0 2px 8px  oklch(0.155 0.060 261 / 0.08);
+  --tds-shadow-toast:  0 8px 24px oklch(0.155 0.060 261 / 0.16);
+
+  /* Interaction */
+  --tds-pressed-overlay: oklch(0.000 0.000 0 / 0.26);
+
+  /* Motion */
+  --tds-ease:          cubic-bezier(0.22, 0.61, 0.36, 1);
+  --tds-duration-fast:   120ms;
+  --tds-duration-base:   200ms;
+  --tds-duration-slow:   320ms;
+
+  /* Radius */
+  --tds-radius-full: 999px;
+  --tds-radius-xl:   16px;
+  --tds-radius-l:    14px;
+  --tds-radius-m:    12px;
+  --tds-radius-s:    10px;
+
+  /* Typography */
+  --tds-font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+              "Apple SD Gothic Neo", sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--tds-bg-primary);
+  --color-foreground: var(--tds-fg-primary);
+  --font-sans: var(--tds-font);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--tds-bg-primary);
+  color: var(--tds-fg-primary);
+  font-family: var(--tds-font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* TDS pressed state */
+.tds-pressed {
+  position: relative;
+  overflow: hidden;
+}
+.tds-pressed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tds-pressed-overlay);
+  opacity: 0;
+  transition: opacity var(--tds-duration-fast) var(--tds-ease);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.tds-pressed:active::after {
+  opacity: 1;
+}
+
