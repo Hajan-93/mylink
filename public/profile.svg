@@ -1,0 +1,115 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    
+    <!-- Skin Gradient -->
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDFC4" />
+      <stop offset="100%" stop-color="#F6C3A0" />
+    </linearGradient>
+
+    <!-- Hair Gradient -->
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Hoodie Gradient -->
+    <linearGradient id="hoodieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+
+    <!-- Glasses Glass Gradient -->
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Soft Shadow Filter -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Circular Outer Background -->
+  <circle cx="120" cy="120" r="116" fill="url(#bgGrad)" />
+  
+  <!-- Subtle inner glowing ring -->
+  <circle cx="120" cy="120" r="110" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2" />
+
+  <!-- Avatar Group clipped to circle -->
+  <g clip-path="url(#avatarClip)">
+    <clipPath id="avatarClip">
+      <circle cx="120" cy="120" r="114" />
+    </clipPath>
+
+    <!-- Background light ambiance -->
+    <circle cx="120" cy="85" r="90" fill="#FFFFFF" fill-opacity="0.1" />
+
+    <!-- Hoodie Body / Torso -->
+    <path d="M40 240 C40 185 75 168 120 168 C165 168 200 185 200 240 Z" fill="url(#hoodieGrad)" filter="url(#softShadow)" />
+    
+    <!-- Hoodie Strings / Collar details -->
+    <path d="M102 172 Q120 195 138 172" fill="none" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" />
+    <path d="M108 190 L108 212" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.8" />
+    <path d="M132 190 L132 212" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.8" />
+
+    <!-- Neck -->
+    <path d="M106 142 H134 V170 H106 Z" fill="url(#skinGrad)" />
+    <path d="M106 150 C114 156 126 156 134 150 V156 C126 162 114 162 106 156 Z" fill="#E2A67D" />
+
+    <!-- Face Shape -->
+    <rect x="85" y="75" width="70" height="78" rx="35" fill="url(#skinGrad)" filter="url(#softShadow)" />
+
+    <!-- Ears -->
+    <circle cx="83" cy="115" r="9" fill="url(#skinGrad)" />
+    <circle cx="157" cy="115" r="9" fill="url(#skinGrad)" />
+
+    <!-- Cheeks (Blush) -->
+    <circle cx="97" cy="123" r="6" fill="#F87171" fill-opacity="0.35" />
+    <circle cx="143" cy="123" r="6" fill="#F87171" fill-opacity="0.35" />
+
+    <!-- Eyes -->
+    <circle cx="102" cy="112" r="4.5" fill="#0F172A" />
+    <circle cx="138" cy="112" r="4.5" fill="#0F172A" />
+    <!-- Eye highlights -->
+    <circle cx="103.5" cy="110.5" r="1.5" fill="#FFFFFF" />
+    <circle cx="139.5" cy="110.5" r="1.5" fill="#FFFFFF" />
+
+    <!-- Glasses Frame -->
+    <rect x="91" y="101" width="22" height="20" rx="6" fill="url(#glassGrad)" stroke="#1E293B" stroke-width="2.5" />
+    <rect x="127" y="101" width="22" height="20" rx="6" fill="url(#glassGrad)" stroke="#1E293B" stroke-width="2.5" />
+    <path d="M113 111 L127 111" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M85 109 L91 109" stroke="#1E293B" stroke-width="2" stroke-linecap="round" />
+    <path d="M149 109 L155 109" stroke="#1E293B" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Eyebrows -->
+    <path d="M96 97 Q102 94 108 97" fill="none" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M132 97 Q138 94 144 97" fill="none" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Cute Smile -->
+    <path d="M113 131 Q120 137 127 131" fill="none" stroke="#8A4A32" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Hair (Modern cut with fringe) -->
+    <path d="M82 92 C82 56 100 50 120 50 C140 50 158 56 158 92 C158 96 152 95 149 87 C144 76 137 73 130 83 C124 90 116 83 110 82 C104 81 97 87 91 87 C88 94 82 96 82 92 Z" fill="url(#hairGrad)" />
+
+    <!-- Sprout (새싹 🌱) - symbol of growing dev -->
+    <g transform="translate(120, 48)">
+      <path d="M0 6 C-1 0 0 -8 2 -12" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" />
+      <!-- Left leaf -->
+      <path d="M1 -9 C-6 -10 -8 -5 -5 -3 C-2 -1 1 -5 1 -9 Z" fill="#4ADE80" />
+      <!-- Right leaf -->
+      <path d="M2 -11 C9 -13 11 -7 7 -5 C3 -3 2 -7 2 -11 Z" fill="#22C55E" />
+    </g>
+
+    <!-- Tiny decorative sparkle -->
+    <path d="M185 75 L187 81 L193 83 L187 85 L185 91 L183 85 L177 83 L183 81 Z" fill="#FDE047" />
+    <path d="M55 105 L56 109 L60 110 L56 111 L55 115 L54 111 L50 110 L54 109 Z" fill="#FDE047" opacity="0.8" />
+  </g>
+</svg>
