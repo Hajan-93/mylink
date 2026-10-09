@@ -1,0 +1,184 @@
+{
+  "profile": {
+    "id": "usr_hajin_01",
+    "name": "전하진",
+    "headline": "주니어 프론트엔드 개발자 · 광운대학교",
+    "bio": "안녕하세요! 새로운 기술 탐구와 직접 만드는 즐거움을 좋아하는 개발자예요. 함께 성장해요 🌱",
+    "avatarUrl": "/profile.svg",
+    "bottomCtaText": "커피챗 신청하기 ☕",
+    "bottomCtaUrl": "mailto:contact@example.com",
+    "skills": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Node.js",
+      "Git",
+      "Figma",
+      "SQL"
+    ],
+    "highlights": [
+      { "emoji": "🚀", "value": "100+", "label": "커밋", "sub": "이번 달" },
+      { "emoji": "🌱", "value": "1,024일", "label": "성장 중", "sub": "매일 코딩" },
+      { "emoji": "☕", "value": "∞", "label": "커피챗", "sub": "항상 열려있어요" }
+    ],
+    "socials": [
+      {
+        "id": "soc_gh_01",
+        "platform": "github",
+        "url": "https://github.com",
+        "isActive": true
+      },
+      {
+        "id": "soc_in_02",
+        "platform": "instagram",
+        "url": "https://instagram.com",
+        "isActive": true
+      },
+      {
+        "id": "soc_x_03",
+        "platform": "x",
+        "url": "https://x.com",
+        "isActive": true
+      },
+      {
+        "id": "soc_li_04",
+        "platform": "linkedin",
+        "url": "https://linkedin.com",
+        "isActive": true
+      }
+    ]
+  },
+  "links": [
+    {
+      "id": "lnk_01",
+      "title": "GitHub 저장소",
+      "url": "https://github.com",
+      "desc": "오픈소스 기여 및 일일 잔디 심기 기록",
+      "emoji": "⚡",
+      "category": "main",
+      "order": 1,
+      "isActive": true,
+      "clickCount": 342,
+      "createdAt": "2026-09-01T09:10:00.000Z",
+      "updatedAt": "2026-09-25T14:20:00.000Z"
+    },
+    {
+      "id": "lnk_02",
+      "title": "기술 블로그 (Velog)",
+      "url": "https://velog.io",
+      "desc": "학습 기록, 트러블슈팅, 회고글 모아보기",
+      "emoji": "📝",
+      "category": "main",
+      "order": 2,
+      "isActive": true,
+      "clickCount": 819,
+      "createdAt": "2026-09-01T09:15:00.000Z",
+      "updatedAt": "2026-09-28T11:00:00.000Z"
+    },
+    {
+      "id": "lnk_03",
+      "title": "노션 이력서 & 포트폴리오",
+      "url": "https://notion.so",
+      "desc": "경력 사항, 기술 스택, 프로젝트 상세 명세",
+      "emoji": "📄",
+      "category": "main",
+      "order": 3,
+      "isActive": true,
+      "clickCount": 512,
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-09-29T16:45:00.000Z"
+    },
+    {
+      "id": "lnk_04",
+      "title": "MyLink — 모바일 링크인바이오 서비스",
+      "url": "https://github.com",
+      "desc": "Next.js & TDS 기반의 간편 링크 공유 프로필",
+      "emoji": "🔗",
+      "category": "projects",
+      "order": 4,
+      "isActive": true,
+      "clickCount": 274,
+      "createdAt": "2026-09-05T13:10:00.000Z",
+      "updatedAt": "2026-09-30T08:30:00.000Z"
+    },
+    {
+      "id": "lnk_05",
+      "title": "Toss UI 클론 프로젝트",
+      "url": "https://github.com",
+      "desc": "토스 디자인 시스템(TDS) 컴포넌트 라이브러리 구현",
+      "emoji": "💳",
+      "category": "projects",
+      "order": 5,
+      "isActive": true,
+      "clickCount": 198,
+      "createdAt": "2026-09-10T15:20:00.000Z",
+      "updatedAt": "2026-09-20T10:00:00.000Z"
+    },
+    {
+      "id": "lnk_06",
+      "title": "인터랙티브 웹 아트 갤러리",
+      "url": "https://example.com",
+      "desc": "Canvas & WebGL을 활용한 인터랙티브 그래픽 작업물",
+      "emoji": "🎨",
+      "category": "projects",
+      "order": 6,
+      "isActive": true,
+      "clickCount": 145,
+      "createdAt": "2026-09-12T11:00:00.000Z",
+      "updatedAt": "2026-09-22T17:30:00.000Z"
+    },
+    {
+      "id": "lnk_07",
+      "title": "React 19와 Next.js 최신 변경점 정리",
+      "url": "https://velog.io",
+      "desc": "서버 컴포넌트와 액션으로 변화하는 프론트엔드 생태계",
+      "emoji": "💡",
+      "category": "articles",
+      "order": 7,
+      "isActive": true,
+      "clickCount": 420,
+      "createdAt": "2026-09-15T09:30:00.000Z",
+      "updatedAt": "2026-09-26T18:00:00.000Z"
+    },
+    {
+      "id": "lnk_08",
+      "title": "토스 디자인 시스템(TDS) 인터랙션 뽀개기",
+      "url": "https://velog.io",
+      "desc": "모바일 웹에서 네이티브 앱 같은 터치감 구현하기",
+      "emoji": "🎯",
+      "category": "articles",
+      "order": 8,
+      "isActive": true,
+      "clickCount": 388,
+      "createdAt": "2026-09-18T14:00:00.000Z",
+      "updatedAt": "2026-09-27T09:15:00.000Z"
+    },
+    {
+      "id": "lnk_09",
+      "title": "1:1 커피챗 예약 (구글 캘린더)",
+      "url": "https://calendly.com",
+      "desc": "이직, 커리어, 기술 이야기 언제든 환영해요",
+      "emoji": "☕",
+      "category": "contact",
+      "order": 9,
+      "isActive": true,
+      "clickCount": 96,
+      "createdAt": "2026-09-20T10:15:00.000Z",
+      "updatedAt": "2026-09-30T10:00:00.000Z"
+    },
+    {
+      "id": "lnk_10",
+      "title": "이메일로 문의하기",
+      "url": "mailto:contact@example.com",
+      "desc": "협업 제안이나 질문은 편하게 메일 남겨주세요",
+      "emoji": "✉️",
+      "category": "contact",
+      "order": 10,
+      "isActive": true,
+      "clickCount": 63,
+      "createdAt": "2026-09-20T10:20:00.000Z",
+      "updatedAt": "2026-09-28T14:30:00.000Z"
+    }
+  ]
+}
