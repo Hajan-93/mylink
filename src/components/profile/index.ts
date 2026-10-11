@@ -4,3 +4,4 @@ export { LinkCard, type LinkCardProps } from "./link-card";
 export { SectionHeader } from "./section-header";
 export { BottomCta } from "./bottom-cta";
 export { ShareButton } from "./share-button";
+export { AddLinkDialog } from "./add-link-dialog";

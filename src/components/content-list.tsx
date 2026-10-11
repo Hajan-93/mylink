@@ -6,12 +6,13 @@ import { LinkCard, SectionHeader } from "./profile";
 
 interface ContentListProps {
   contents: ContentItem[];
+  onDeleteLink?: (id: string) => void;
 }
 
 /**
  * 정렬된 통합 콘텐츠(섹션 및 링크 카드) 목록 렌더링 컴포넌트
  */
-export function ContentList({ contents }: ContentListProps) {
+export function ContentList({ contents, onDeleteLink }: ContentListProps) {
   if (!contents || contents.length === 0) {
     return (
       <div className="py-12 text-center text-[14px] text-tds-fg-tertiary">
@@ -46,6 +47,7 @@ export function ContentList({ contents }: ContentListProps) {
             desc={item.desc}
             emoji={item.emoji}
             external={true}
+            onDelete={onDeleteLink}
           />
         );
       })}
