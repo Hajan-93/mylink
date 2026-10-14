@@ -6,7 +6,7 @@ import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles } from "lucide-reac
 import { ContentItem } from "@/types";
 import { DUMMY_CONTENTS } from "@/data/dummy-data";
 import { initializeStorage, saveStoredContents } from "@/lib/storage";
-import { addLinkToFirestore } from "@/lib/firestore";
+import { addLinkToFirestore, getLinksFromFirestore } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import { AddLinkDialog } from "@/components/profile";
 
@@ -14,18 +14,20 @@ export default function MyLinkPage() {
   const [contents, setContents] = useState<ContentItem[]>(DUMMY_CONTENTS);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    const syncData = () => {
+  // Firestore에서 링크 목록 불러오기
+  const fetchLinks = async () => {
+    try {
+      const links = await getLinksFromFirestore();
+      setContents(links);
+    } catch (error) {
+      console.error("Firestore 불러오기 실패, 로컬 데이터 사용:", error);
       const data = initializeStorage();
       setContents(data.contents);
-    };
+    }
+  };
 
-    syncData();
-
-    window.addEventListener("storage", syncData);
-    return () => {
-      window.removeEventListener("storage", syncData);
-    };
+  useEffect(() => {
+    fetchLinks();
   }, []);
 
   const showToast = (message: string) => {
@@ -36,26 +38,23 @@ export default function MyLinkPage() {
   };
 
   const handleAddLink = async (newLinkData: Omit<ContentItem, "order">) => {
-    const maxOrder = contents.reduce(
-      (max, item) => Math.max(max, item.order ?? 0),
-      0
-    );
-
-    const newContentItem: ContentItem = {
-      ...newLinkData,
-      order: maxOrder + 1,
-    };
-
-    const updatedContents = [...contents, newContentItem];
-    setContents(updatedContents);
-    saveStoredContents(updatedContents);
-
     // Firestore에 저장 (type이 "link"인 경우에만)
     if (newLinkData.type === "link") {
       try {
         await addLinkToFirestore(newLinkData);
+        // 저장 후 최신 목록 갱신
+        await fetchLinks();
       } catch (error) {
         console.error("Firestore 저장 실패:", error);
+        // 실패 시 로컬 상태만 업데이트
+        const maxOrder = contents.reduce(
+          (max, item) => Math.max(max, item.order ?? 0),
+          0
+        );
+        const newContentItem: ContentItem = { ...newLinkData, order: maxOrder + 1 };
+        const updatedContents = [...contents, newContentItem];
+        setContents(updatedContents);
+        saveStoredContents(updatedContents);
       }
     }
 
