@@ -4,14 +4,14 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles } from "lucide-react";
 import { ContentItem } from "@/types";
-import { DUMMY_CONTENTS } from "@/data/dummy-data";
-import { initializeStorage, saveStoredContents } from "@/lib/storage";
+import { saveStoredContents } from "@/lib/storage";
 import { addLinkToFirestore, getLinksFromFirestore } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import { AddLinkDialog } from "@/components/profile";
 
 export default function MyLinkPage() {
-  const [contents, setContents] = useState<ContentItem[]>(DUMMY_CONTENTS);
+  const [contents, setContents] = useState<ContentItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Firestore에서 링크 목록 불러오기
@@ -20,9 +20,10 @@ export default function MyLinkPage() {
       const links = await getLinksFromFirestore();
       setContents(links);
     } catch (error) {
-      console.error("Firestore 불러오기 실패, 로컬 데이터 사용:", error);
-      const data = initializeStorage();
-      setContents(data.contents);
+      console.error("Firestore 불러오기 실패:", error);
+      setContents([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -38,23 +39,19 @@ export default function MyLinkPage() {
   };
 
   const handleAddLink = async (newLinkData: Omit<ContentItem, "order">) => {
-    // Firestore에 저장 (type이 "link"인 경우에만)
     if (newLinkData.type === "link") {
       try {
         await addLinkToFirestore(newLinkData);
-        // 저장 후 최신 목록 갱신
         await fetchLinks();
       } catch (error) {
         console.error("Firestore 저장 실패:", error);
-        // 실패 시 로컬 상태만 업데이트
         const maxOrder = contents.reduce(
           (max, item) => Math.max(max, item.order ?? 0),
           0
         );
         const newContentItem: ContentItem = { ...newLinkData, order: maxOrder + 1 };
-        const updatedContents = [...contents, newContentItem];
-        setContents(updatedContents);
-        saveStoredContents(updatedContents);
+        setContents((prev) => [...prev, newContentItem]);
+        saveStoredContents([...contents, newContentItem]);
       }
     }
 
@@ -144,7 +141,19 @@ export default function MyLinkPage() {
 
           {/* 링크 목록 및 삭제 관리 */}
           <section className="flex flex-col gap-2">
-            <ContentList contents={contents} onDeleteLink={handleDeleteLink} />
+            {isLoading ? (
+              // 스켈레톤 UI
+              <div className="flex flex-col gap-2.5" aria-busy="true" aria-label="링크 목록 불러오는 중">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-[68px] rounded-2xl bg-tds-bg-primary border border-tds-line-default animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : (
+              <ContentList contents={contents} onDeleteLink={handleDeleteLink} />
+            )}
           </section>
         </main>
       </div>
