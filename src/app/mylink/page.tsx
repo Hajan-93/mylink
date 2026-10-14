@@ -6,6 +6,7 @@ import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles } from "lucide-reac
 import { ContentItem } from "@/types";
 import { DUMMY_CONTENTS } from "@/data/dummy-data";
 import { initializeStorage, saveStoredContents } from "@/lib/storage";
+import { addLinkToFirestore } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import { AddLinkDialog } from "@/components/profile";
 
@@ -34,7 +35,7 @@ export default function MyLinkPage() {
     }, 2500);
   };
 
-  const handleAddLink = (newLinkData: Omit<ContentItem, "order">) => {
+  const handleAddLink = async (newLinkData: Omit<ContentItem, "order">) => {
     const maxOrder = contents.reduce(
       (max, item) => Math.max(max, item.order ?? 0),
       0
@@ -48,6 +49,15 @@ export default function MyLinkPage() {
     const updatedContents = [...contents, newContentItem];
     setContents(updatedContents);
     saveStoredContents(updatedContents);
+
+    // Firestore에 저장 (type이 "link"인 경우에만)
+    if (newLinkData.type === "link") {
+      try {
+        await addLinkToFirestore(newLinkData);
+      } catch (error) {
+        console.error("Firestore 저장 실패:", error);
+      }
+    }
 
     showToast("🎉 새 링크를 추가했어요!");
   };
