@@ -159,3 +159,12 @@ export function saveStoredContents(contents: ContentItem[]): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEYS.CONTENTS, JSON.stringify(contents));
 }
+
+/**
+ * Firestore 전환 후 LocalStorage에 남은 링크 데이터를 제거합니다.
+ * 앱 최초 로드 시 한 번 실행하여 더미 데이터를 정리합니다.
+ */
+export function clearLegacyContents(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORAGE_KEYS.CONTENTS);
+}

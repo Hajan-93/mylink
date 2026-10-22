@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Settings } from "lucide-react";
 import { ContentItem, ProfileData, SocialLink } from "@/types";
-import {
-  DUMMY_CONTENTS,
-  DUMMY_PROFILE,
-  DUMMY_SOCIALS,
-} from "@/data/dummy-data";
-import { initializeStorage } from "@/lib/storage";
+import { DUMMY_PROFILE, DUMMY_SOCIALS } from "@/data/dummy-data";
+import { getStoredProfile, getStoredSocials, clearLegacyContents } from "@/lib/storage";
+import { getLinksFromFirestore } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import {
   BottomCta,
@@ -20,43 +17,35 @@ import {
 export default function Home() {
   const [profile, setProfile] = useState<ProfileData>(DUMMY_PROFILE);
   const [socials, setSocials] = useState<SocialLink[]>(DUMMY_SOCIALS);
-  const [contents, setContents] = useState<ContentItem[]>(DUMMY_CONTENTS);
+  const [contents, setContents] = useState<ContentItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // 마운트 시 LocalStorage에서 데이터 동기화 및 시드 주입
   useEffect(() => {
-    const syncData = () => {
-      const data = initializeStorage();
-      setProfile(data.profile);
-      setSocials(data.socials);
-      setContents(data.contents);
-    };
+    // LocalStorage에 남은 더미 링크 데이터 제거
+    clearLegacyContents();
 
-    syncData();
+    // 프로필·소셜은 LocalStorage 유지 (Firestore 미연동)
+    setProfile(getStoredProfile());
+    setSocials(getStoredSocials());
 
-    // 다른 탭이나 /mylink 관리 페이지에서 LocalStorage 변경 시 실시간 동기화
-    window.addEventListener("storage", syncData);
-    return () => {
-      window.removeEventListener("storage", syncData);
-    };
+    // 링크 목록은 Firestore에서 불러오기
+    getLinksFromFirestore()
+      .then(setContents)
+      .catch(() => setContents([]))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  // 토스트 메시지 표시 헬퍼
   const showToast = (message: string) => {
     setToastMessage(message);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 2500);
+    setTimeout(() => setToastMessage(null), 2500);
   };
 
-  // 링크 공유 액션
-  const handleCopied = () => {
-    showToast("🔗 링크를 복사했어요!");
-  };
+  const handleCopied = () => showToast("🔗 링크를 복사했어요!");
 
   return (
     <>
-      {/* ── 1. Toss 스타일 토스트 알림 ────────────────────── */}
+      {/* ── 1. 토스트 알림 ─────────────────────────────────── */}
       {toastMessage && (
         <div
           role="status"
@@ -67,22 +56,30 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 2. 메인 페이지 Shell (모바일 480px 중심 레이아웃) ─ */}
+      {/* ── 2. 메인 페이지 Shell ───────────────────────────── */}
       <div className="min-h-screen flex flex-col items-center pb-32 bg-tds-bg-primary">
         <main className="w-full max-w-[480px] px-5 flex flex-col gap-6">
-          {/* 프로필 헤더 (아바타, 이름, 헤드라인, 바이오, 소셜 링크 통합) */}
           <ProfileHeader profile={profile} socials={socials} />
 
-          {/* 콘텐츠 링크 목록 영역 (방문자 전용 뷰: 삭제/수정 버튼 없음) */}
+          {/* 링크 목록 */}
           <section className="flex flex-col gap-2">
-            <ContentList contents={contents} />
+            {isLoading ? (
+              <div className="flex flex-col gap-2.5" aria-busy="true" aria-label="링크 목록 불러오는 중">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-[68px] rounded-2xl bg-tds-bg-secondary border border-tds-line-default animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : (
+              <ContentList contents={contents} />
+            )}
           </section>
 
-          {/* 공유하기 액션 버튼 */}
+          {/* 공유하기 버튼 */}
           <section className="flex flex-col items-center gap-2 pt-2 pb-4">
             <ShareButton onCopied={handleCopied} />
-
-            {/* 관리 페이지 바로가기 (소유자 편의 제공) */}
             <Link
               href="/mylink"
               className="inline-flex items-center gap-1.5 py-1.5 px-3 text-[13px] font-medium text-tds-fg-tertiary hover:text-tds-fg-primary transition-colors no-underline select-none"
@@ -100,11 +97,8 @@ export default function Home() {
         </main>
       </div>
 
-      {/* ── 3. 화면 하단 고정 Bottom CTA ───────────────────── */}
-      <BottomCta
-        text={profile.bottomCtaText}
-        url={profile.bottomCtaUrl}
-      />
+      {/* ── 3. Bottom CTA ──────────────────────────────────── */}
+      <BottomCta text={profile.bottomCtaText} url={profile.bottomCtaUrl} />
     </>
   );
 }
