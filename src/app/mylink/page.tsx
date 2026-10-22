@@ -5,7 +5,12 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles } from "lucide-react";
 import { ContentItem } from "@/types";
 import { saveStoredContents } from "@/lib/storage";
-import { addLinkToFirestore, getLinksFromFirestore } from "@/lib/firestore";
+import {
+  addLinkToFirestore,
+  getLinksFromFirestore,
+  updateLinkInFirestore,
+  deleteLinkFromFirestore,
+} from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import { AddLinkDialog } from "@/components/profile";
 
@@ -58,7 +63,25 @@ export default function MyLinkPage() {
     showToast("🎉 새 링크를 추가했어요!");
   };
 
-  const handleDeleteLink = (id: string) => {
+  const handleUpdateLink = async (
+    id: string,
+    updated: { title: string; url: string }
+  ) => {
+    await updateLinkInFirestore(id, updated);
+    setContents((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, title: updated.title, url: updated.url } : item
+      )
+    );
+    showToast("✏️ 링크를 수정했어요!");
+  };
+
+  const handleDeleteLink = async (id: string) => {
+    try {
+      await deleteLinkFromFirestore(id);
+    } catch (error) {
+      console.error("Firestore 삭제 실패:", error);
+    }
     const updatedContents = contents.filter((item) => item.id !== id);
     setContents(updatedContents);
     saveStoredContents(updatedContents);
@@ -139,7 +162,7 @@ export default function MyLinkPage() {
             <AddLinkDialog onAddLink={handleAddLink} />
           </section>
 
-          {/* 링크 목록 및 삭제 관리 */}
+          {/* 링크 목록 및 인라인 수정 / 삭제 관리 */}
           <section className="flex flex-col gap-2">
             {isLoading ? (
               // 스켈레톤 UI
@@ -152,7 +175,11 @@ export default function MyLinkPage() {
                 ))}
               </div>
             ) : (
-              <ContentList contents={contents} onDeleteLink={handleDeleteLink} />
+              <ContentList
+                contents={contents}
+                onUpdateLink={handleUpdateLink}
+                onDeleteLink={handleDeleteLink}
+              />
             )}
           </section>
         </main>

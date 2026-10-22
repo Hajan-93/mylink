@@ -7,6 +7,9 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  doc,
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { ContentItem } from "@/types";
 
@@ -46,4 +49,27 @@ export async function getLinksFromFirestore(): Promise<ContentItem[]> {
     title: doc.data().title ?? "",
     url: doc.data().url ?? "",
   }));
+}
+
+/**
+ * users/anonymous/links에서 특정 링크의 제목과 URL을 Firestore updateDoc으로 수정합니다.
+ */
+export async function updateLinkInFirestore(
+  id: string,
+  data: { title: string; url: string }
+): Promise<void> {
+  const docRef = doc(db, "users", "anonymous", "links", id);
+  await updateDoc(docRef, {
+    title: data.title,
+    url: data.url,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+/**
+ * users/anonymous/links에서 특정 링크를 Firestore deleteDoc으로 삭제합니다.
+ */
+export async function deleteLinkFromFirestore(id: string): Promise<void> {
+  const docRef = doc(db, "users", "anonymous", "links", id);
+  await deleteDoc(docRef);
 }
