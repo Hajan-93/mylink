@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,9 +15,15 @@ const firebaseConfig = {
 // 중복 초기화 방지
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Analytics는 브라우저 환경에서만 동작
-const analyticsPromise = isSupported().then((supported) =>
-  supported ? getAnalytics(app) : null
-);
+// Firebase Auth 인스턴스 초기화
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
-export { app, analyticsPromise };
+// Analytics는 브라우저 환경에서만 동작
+const analyticsPromise =
+  typeof window !== "undefined"
+    ? isSupported().then((supported) => (supported ? getAnalytics(app) : null))
+    : Promise.resolve(null);
+
+export { app, auth, googleProvider, analyticsPromise };

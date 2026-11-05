@@ -87,6 +87,39 @@
   --sidebar-ring:    oklch(0.708 0 0);
 }
 
+/* 시스템/브라우저의 다크 모드 설정 자동 감지 및 반응 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tds-bg-primary:    oklch(0.145 0.015 254);
+    --tds-bg-secondary:  oklch(0.205 0.018 254);
+    --tds-bg-tertiary:   oklch(0.269 0.020 254);
+    --tds-bg-brand-weak: oklch(0.250 0.060 255);
+
+    --tds-fg-primary:    oklch(0.985 0.005 254);
+    --tds-fg-secondary:  oklch(0.750 0.015 254);
+    --tds-fg-tertiary:   oklch(0.600 0.015 254);
+    --tds-fg-placeholder:oklch(0.480 0.012 254);
+    --tds-fg-disabled:   oklch(0.380 0.010 254);
+
+    --tds-line-default:  oklch(1 0 0 / 12%);
+    --tds-line-strong:   oklch(1 0 0 / 22%);
+
+    --tds-shadow-card:   0 2px 8px oklch(0 0 0 / 0.4);
+    --tds-shadow-toast:  0 8px 24px oklch(0 0 0 / 0.6);
+
+    --background:        oklch(0.145 0.015 254);
+    --foreground:        oklch(0.985 0.005 254);
+    --card:              oklch(0.205 0.018 254);
+    --card-foreground:   oklch(0.985 0.005 254);
+    --popover:           oklch(0.205 0.018 254);
+    --popover-foreground:oklch(0.985 0.005 254);
+    --primary:           oklch(0.922 0 0);
+    --primary-foreground:oklch(0.205 0 0);
+    --border:            oklch(1 0 0 / 12%);
+    --input:             oklch(1 0 0 / 15%);
+  }
+}
+
 @theme inline {
   --color-background: var(--tds-bg-primary);
   --color-foreground: var(--tds-fg-primary);
@@ -180,40 +213,6 @@ body {
 }
 .tds-pressed:active::after {
   opacity: 1;
-}
-
-.dark {
-  --background:    oklch(0.145 0 0);
-  --foreground:    oklch(0.985 0 0);
-  --card:    oklch(0.205 0 0);
-  --card-foreground:    oklch(0.985 0 0);
-  --popover:    oklch(0.205 0 0);
-  --popover-foreground:    oklch(0.985 0 0);
-  --primary:    oklch(0.922 0 0);
-  --primary-foreground:    oklch(0.205 0 0);
-  --secondary:    oklch(0.269 0 0);
-  --secondary-foreground:    oklch(0.985 0 0);
-  --muted:    oklch(0.269 0 0);
-  --muted-foreground:    oklch(0.708 0 0);
-  --accent:    oklch(0.269 0 0);
-  --accent-foreground:    oklch(0.985 0 0);
-  --destructive:    oklch(0.704 0.191 22.216);
-  --border:    oklch(1 0 0 / 10%);
-  --input:    oklch(1 0 0 / 15%);
-  --ring:    oklch(0.556 0 0);
-  --chart-1:    oklch(0.87 0 0);
-  --chart-2:    oklch(0.556 0 0);
-  --chart-3:    oklch(0.439 0 0);
-  --chart-4:    oklch(0.371 0 0);
-  --chart-5:    oklch(0.269 0 0);
-  --sidebar:    oklch(0.205 0 0);
-  --sidebar-foreground:    oklch(0.985 0 0);
-  --sidebar-primary:    oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground:    oklch(0.985 0 0);
-  --sidebar-accent:    oklch(0.269 0 0);
-  --sidebar-accent-foreground:    oklch(0.985 0 0);
-  --sidebar-border:    oklch(1 0 0 / 10%);
-  --sidebar-ring:    oklch(0.556 0 0);
 }
 
 @layer base {

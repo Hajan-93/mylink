@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users/{userId}/links 서브컬렉션
+    match /users/{userId}/links/{linkId} {
+      // 1. 조회: 누구나 가능 (비로그인/로그인 무관)
+      allow read: if true;
+
+      // 2. 수정(생성, 변경, 삭제): 로그인 필수 (로그인한 사용자 본인의 UID 경로)
+      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 기본 규칙: 그 외 경로는 본인 인증 확인
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

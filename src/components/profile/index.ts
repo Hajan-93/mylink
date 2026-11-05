@@ -5,3 +5,4 @@ export { SectionHeader } from "./section-header";
 export { BottomCta } from "./bottom-cta";
 export { ShareButton } from "./share-button";
 export { AddLinkDialog } from "./add-link-dialog";
+export { EditProfileDialog } from "./edit-profile-dialog";

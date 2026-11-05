@@ -17,6 +17,8 @@ export function ProfileAvatar({
   size = 88,
   className,
 }: ProfileAvatarProps) {
+  const isExternal = Boolean(src && (src.startsWith("http://") || src.startsWith("https://")));
+
   return (
     <div
       className={cn(
@@ -31,6 +33,7 @@ export function ProfileAvatar({
         fill
         sizes={`${size}px`}
         className="object-cover"
+        unoptimized={isExternal}
         priority
       />
     </div>

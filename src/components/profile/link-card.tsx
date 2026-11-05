@@ -30,6 +30,7 @@ export interface LinkCardProps {
   emoji?: string;
   external?: boolean;
   className?: string;
+  canEdit?: boolean;
   onDelete?: (id: string) => Promise<void> | void;
   onUpdate?: (id: string, updated: { title: string; url: string }) => Promise<void> | void;
 }
@@ -47,6 +48,7 @@ export function LinkCard({
   emoji = "🔗",
   external = true,
   className,
+  canEdit = false,
   onDelete,
   onUpdate,
 }: LinkCardProps) {
@@ -72,6 +74,7 @@ export function LinkCard({
   const handleEditClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!canEdit) return;
     setEditTitle(title);
     setEditUrl(url);
     setFieldErrors({});
@@ -82,6 +85,7 @@ export function LinkCard({
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!canEdit) return;
     setIsDeleteDialogOpen(true);
   };
 
@@ -344,27 +348,31 @@ export function LinkCard({
           )}
         </a>
 
-        {/* 액션 영역: 수정 버튼, 삭제 버튼 & 우측 셰브론 */}
+        {/* 액션 영역: 로그인 상태일 때만 수정/삭제 버튼 표시, 비로그인 시 우측 셰브론만 표시 */}
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={handleEditClick}
-            title="이 링크 수정하기"
-            aria-label={`${title} 링크 수정하기`}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-tds-fg-secondary hover:text-tds-fg-brand hover:bg-tds-bg-brand-weak transition-colors cursor-pointer select-none"
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
+          {canEdit && (
+            <>
+              <button
+                type="button"
+                onClick={handleEditClick}
+                title="이 링크 수정하기"
+                aria-label={`${title} 링크 수정하기`}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-tds-fg-secondary hover:text-tds-fg-brand hover:bg-tds-bg-brand-weak transition-colors cursor-pointer select-none"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
 
-          <button
-            type="button"
-            onClick={handleDeleteClick}
-            title="이 링크 삭제하기"
-            aria-label={`${title} 링크 삭제하기`}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-tds-fg-placeholder hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer select-none"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                title="이 링크 삭제하기"
+                aria-label={`${title} 링크 삭제하기`}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-tds-fg-placeholder hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer select-none"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
 
           <a
             href={url}
