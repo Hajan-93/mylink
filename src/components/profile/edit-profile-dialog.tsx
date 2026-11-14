@@ -12,9 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
-import { getUserProfileFromFirestore, syncUserProfileToFirestore } from "@/lib/firestore";
+import {
+  getUserProfileFromFirestore,
+  syncUserProfileToFirestore,
+  checkUsernameAvailability,
+  generateDefaultUsername,
+} from "@/lib/firestore";
 import { ProfileData } from "@/types";
-import { Loader2, AlertCircle, UserCheck } from "lucide-react";
+import { Loader2, AlertCircle, UserCheck, CheckCircle2 } from "lucide-react";
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -25,6 +30,7 @@ interface EditProfileDialogProps {
 const MAX_NAME_LENGTH = 30;
 const MAX_HEADLINE_LENGTH = 50;
 const MAX_BIO_LENGTH = 150;
+const MAX_USERNAME_LENGTH = 20;
 
 export function EditProfileDialog({
   open,
@@ -32,12 +38,15 @@ export function EditProfileDialog({
   onSuccess,
 }: EditProfileDialogProps) {
   const { user } = useAuth();
+  const [username, setUsername] = useState("");
+  const [originalUsername, setOriginalUsername] = useState("");
   const [name, setName] = useState("");
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [usernameStatus, setUsernameStatus] = useState<string | null>(null);
 
   // 모달이 열릴 때 기존 프로필 정보 로드
   useEffect(() => {
@@ -46,12 +55,19 @@ export function EditProfileDialog({
       try {
         setIsLoading(true);
         setError(null);
+        setUsernameStatus(null);
         const profile = await getUserProfileFromFirestore(user.uid);
         if (profile) {
-          setName(profile.name || user.displayName || "");
+          const loadedUsername = profile.username || generateDefaultUsername(user.email || user.displayName);
+          setUsername(loadedUsername);
+          setOriginalUsername(profile.username || "");
+          setName(profile.displayName || profile.name || user.displayName || "");
           setHeadline(profile.headline || "");
           setBio(profile.bio || "");
         } else {
+          const defaultUsername = generateDefaultUsername(user.email || user.displayName);
+          setUsername(defaultUsername);
+          setOriginalUsername("");
           setName(user.displayName || "사용자");
           setHeadline("");
           setBio("");
@@ -66,13 +82,35 @@ export function EditProfileDialog({
     loadCurrentProfile();
   }, [user, open]);
 
+  const handleCheckUsername = async () => {
+    if (!username.trim()) {
+      setError("username을 입력해주세요.");
+      return;
+    }
+    setError(null);
+    const result = await checkUsernameAvailability(username, user?.uid);
+    if (!result.available) {
+      setError(result.error || "이미 사용 중인 username입니다.");
+      setUsernameStatus(null);
+    } else {
+      setUsernameStatus("사용 가능한 아이디(username)입니다! ✨");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.uid) return;
 
+    const trimmedUsername = username.trim().toLowerCase();
     const trimmedName = name.trim();
+
+    if (!trimmedUsername) {
+      setError("공유 URL용 username을 3자 이상 입력해주세요.");
+      return;
+    }
+
     if (!trimmedName) {
-      setError("닉네임(이름)을 1자 이상 입력해주세요.");
+      setError("표시될 닉네임(이름)을 1자 이상 입력해주세요.");
       return;
     }
 
@@ -80,7 +118,19 @@ export function EditProfileDialog({
       setIsSaving(true);
       setError(null);
 
+      // 12주차: username 저장 전 중복 체크
+      if (trimmedUsername !== originalUsername) {
+        const checkResult = await checkUsernameAvailability(trimmedUsername, user.uid);
+        if (!checkResult.available) {
+          setError(checkResult.error || "이미 사용 중인 username입니다. 다른 이름을 선택해주세요.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const updated = await syncUserProfileToFirestore(user.uid, {
+        username: trimmedUsername,
+        displayName: trimmedName,
         name: trimmedName,
         headline: headline.trim(),
         bio: bio.trim(),
@@ -99,9 +149,10 @@ export function EditProfileDialog({
       }
 
       onOpenChange(false);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("프로필 정보 저장 실패:", err);
-      setError("프로필 저장 중 오류가 발생했습니다.");
+      const errMsg = err instanceof Error ? err.message : "프로필 저장 중 오류가 발생했습니다.";
+      setError(errMsg);
     } finally {
       setIsSaving(false);
     }
@@ -136,14 +187,69 @@ export function EditProfileDialog({
               </div>
             )}
 
-            {/* 1. 닉네임 / 이름 */}
+            {usernameStatus && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 text-emerald-700 text-[13px] border border-green-100">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{usernameStatus}</span>
+              </div>
+            )}
+
+            {/* 1. 공유 URL용 고유 사용자명 (12주차 핵심) */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="edit-profile-username"
+                  className="text-[13px] font-semibold text-tds-fg-secondary"
+                >
+                  공유 URL 아이디 (username) <span className="text-tds-fg-brand">*</span>
+                </label>
+                <span className="text-[11px] text-tds-fg-tertiary tabular-nums">
+                  {username.length}/{MAX_USERNAME_LENGTH}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-tds-fg-tertiary select-none">
+                    /
+                  </span>
+                  <Input
+                    id="edit-profile-username"
+                    type="text"
+                    value={username}
+                    maxLength={MAX_USERNAME_LENGTH}
+                    onChange={(e) => {
+                      setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""));
+                      if (error) setError(null);
+                      if (usernameStatus) setUsernameStatus(null);
+                    }}
+                    placeholder="honggildong"
+                    disabled={isSaving}
+                    className="h-11 pl-6 rounded-xl bg-tds-bg-secondary text-[14px] border-tds-line-default focus-visible:ring-tds-bg-brand"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCheckUsername}
+                  disabled={isSaving || !username.trim()}
+                  className="h-11 px-3 text-[13px] rounded-xl border-tds-line-default shrink-0 font-medium"
+                >
+                  중복 확인
+                </Button>
+              </div>
+              <p className="text-[11px] text-tds-fg-tertiary">
+                내 공유 주소: /{username || "아이디"}
+              </p>
+            </div>
+
+            {/* 2. 화면 표시 닉네임 / 이름 (displayName) */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="edit-profile-name"
                   className="text-[13px] font-semibold text-tds-fg-secondary"
                 >
-                  닉네임 (이름) <span className="text-tds-fg-brand">*</span>
+                  표시 이름 (displayName) <span className="text-tds-fg-brand">*</span>
                 </label>
                 <span className="text-[11px] text-tds-fg-tertiary tabular-nums">
                   {name.length}/{MAX_NAME_LENGTH}

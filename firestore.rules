@@ -1,19 +1,28 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // users/{userId}/links 서브컬렉션
+    // 1. 개인화 링크 목록 (11주차 & 12주차: 조회는 누구나, 수정은 본인만)
     match /users/{userId}/links/{linkId} {
-      // 1. 조회: 누구나 가능 (비로그인/로그인 무관)
       allow read: if true;
-
-      // 2. 수정(생성, 변경, 삭제): 로그인 필수 (로그인한 사용자 본인의 UID 경로)
-      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // 기본 규칙: 그 외 경로는 본인 인증 확인
+    // 2. 프로필 정보 (12주차: 조회는 누구나, 수정은 본인만)
+    match /users/{userId}/profile/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 3. 사용자 기본 문서 (users/{userId})
     match /users/{userId} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 4. username 검색 및 매핑 컬렉션 (조회는 누구나, 생성/수정은 인증된 사용자)
+    match /usernames/{username} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }

@@ -1,7 +1,9 @@
 // PRD 기반 마이링크 데이터 타입 정의
 
 export interface ProfileData {
-  name: string;             // 표시 이름 (예: "전하진")
+  username?: string;        // 12주차: 공유 URL용 고유 사용자명 (예: "honggildong")
+  displayName?: string;     // 12주차: 화면에 표시될 이름 (예: "홍길동")
+  name: string;             // 표시 이름 (기존 호환 유지)
   headline: string;         // 한 줄 소속/직무 (예: "주니어 프론트엔드 개발자 · 광운대학교")
   bio: string;              // 상세 소개글
   avatarUrl: string;        // 프로필 이미지 경로 (예: "/profile.svg")

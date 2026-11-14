@@ -2,24 +2,38 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles } from "lucide-react";
-import { ContentItem } from "@/types";
+import { ArrowLeft, ExternalLink, Link as LinkIcon, Sparkles, Copy, Check, UserCheck } from "lucide-react";
+import { ContentItem, ProfileData } from "@/types";
 import {
   addLinkToFirestore,
   getLinksFromFirestore,
   updateLinkInFirestore,
   deleteLinkFromFirestore,
+  getUserProfileFromFirestore,
 } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
-import { AddLinkDialog } from "@/components/profile";
+import { AddLinkDialog, EditProfileDialog } from "@/components/profile";
 import { LoggedOutView } from "@/components/logged-out-view";
 import { useAuth } from "@/contexts/auth-context";
 
 export default function MyLinkPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // 프로필 정보 불러오기
+  const fetchProfile = useCallback(async (uid: string) => {
+    try {
+      const p = await getUserProfileFromFirestore(uid);
+      setProfile(p);
+    } catch (e) {
+      console.warn("프로필 조회 실패:", e);
+    }
+  }, []);
 
   // Firestore에서 로그인된 유저의 링크 목록 불러오기 (경로: users/{user.uid}/links)
   const fetchLinks = useCallback(async (uid: string) => {
@@ -38,10 +52,12 @@ export default function MyLinkPage() {
   useEffect(() => {
     if (user?.uid) {
       fetchLinks(user.uid);
+      fetchProfile(user.uid);
     } else {
       setContents([]);
+      setProfile(null);
     }
-  }, [user?.uid, fetchLinks]);
+  }, [user?.uid, fetchLinks, fetchProfile]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -173,6 +189,67 @@ export default function MyLinkPage() {
             <LoggedOutView />
           ) : (
             <>
+              {/* 12주차: 내 마이링크 공유 URL 안내 및 프로필 수정 카드 */}
+              <section className="p-4 bg-tds-bg-primary border border-tds-line-default rounded-2xl shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-semibold text-tds-fg-secondary">
+                      내 마이링크 공유 주소
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-tds-bg-brand-weak text-tds-fg-brand">
+                      공유 가능
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsEditProfileOpen(true)}
+                    className="tds-pressed inline-flex items-center gap-1 text-[12px] font-semibold text-tds-fg-brand hover:underline"
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>프로필/아이디 수정</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-tds-bg-secondary border border-tds-line-default">
+                  <Link
+                    href={`/${profile?.username || ""}`}
+                    target="_blank"
+                    className="text-[14px] font-bold text-tds-fg-primary hover:text-tds-fg-brand truncate pr-2 no-underline flex items-center gap-1.5"
+                  >
+                    <span>/{profile?.username || "loading..."}</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-tds-fg-tertiary" />
+                  </Link>
+
+                  <button
+                    onClick={async () => {
+                      if (!profile?.username) return;
+                      const origin = typeof window !== "undefined" ? window.location.origin : "";
+                      const fullUrl = `${origin}/${profile.username}`;
+                      try {
+                        await navigator.clipboard.writeText(fullUrl);
+                        setIsCopied(true);
+                        showToast("🔗 마이링크 주소를 복사했어요!");
+                        setTimeout(() => setIsCopied(false), 2000);
+                      } catch {
+                        showToast("복사에 실패했습니다.");
+                      }
+                    }}
+                    className="tds-pressed shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-tds-bg-primary border border-tds-line-default text-[12px] font-semibold text-tds-fg-secondary hover:text-tds-fg-primary shadow-xs transition-colors"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-600">복사됨</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>주소 복사</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </section>
+
               {/* 링크 요약 카드 */}
               <section className="flex items-center justify-between p-4 bg-tds-bg-primary border border-tds-line-default rounded-2xl shadow-sm">
                 <div className="flex items-center gap-3">
@@ -236,6 +313,15 @@ export default function MyLinkPage() {
           </Link>
         </div>
       )}
+      {/* ── 4. 프로필 수정 다이얼로그 ──────────────────── */}
+      <EditProfileDialog
+        open={isEditProfileOpen}
+        onOpenChange={setIsEditProfileOpen}
+        onSuccess={(updated) => {
+          setProfile(updated);
+          showToast("✨ 프로필 정보를 수정했어요!");
+        }}
+      />
     </>
   );
 }

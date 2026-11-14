@@ -34,14 +34,15 @@ export default function Home() {
     try {
       setIsDataLoading(true);
 
-      // 1. 유저 정보 조회 및 동기화 (경로: users/{user.uid})
+      // 1. 유저 정보 조회 및 동기화 (경로: users/{user.uid} 및 users/{user.uid}/profile)
       let userProfile = await getUserProfileFromFirestore(uid);
-      if (!userProfile) {
+      if (!userProfile || !userProfile.username) {
         userProfile = await syncUserProfileToFirestore(uid, {
-          name: user?.displayName || "사용자",
-          avatarUrl: user?.photoURL || "/profile.svg",
-          headline: user?.email ? `${user.email}` : "나만의 링크 프로필",
-          bio: "새로운 링크를 추가하고 사람들과 공유해보세요. 🌱",
+          displayName: user?.displayName || userProfile?.name || "사용자",
+          name: user?.displayName || userProfile?.name || "사용자",
+          avatarUrl: user?.photoURL || userProfile?.avatarUrl || "/profile.svg",
+          headline: user?.email ? `${user.email}` : (userProfile?.headline || "나만의 링크 프로필"),
+          bio: userProfile?.bio || "새로운 링크를 추가하고 사람들과 공유해보세요. 🌱",
         });
       }
       setProfile(userProfile);
@@ -212,9 +213,17 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* 공유하기 바로가기 */}
+              {/* 공유하기 바로가기 (12주차: /username 공유 URL) */}
               <section className="flex flex-col items-center gap-2 pt-2 pb-4">
-                <ShareButton onCopied={handleCopied} />
+                <ShareButton
+                  label={profile?.username ? `내 마이링크 주소 복사 (/${profile.username})` : "내 마이링크 공유하기"}
+                  shareUrl={
+                    typeof window !== "undefined" && profile?.username
+                      ? `${window.location.origin}/${profile.username}`
+                      : undefined
+                  }
+                  onCopied={handleCopied}
+                />
               </section>
 
               {/* 푸터 */}

@@ -7,6 +7,7 @@ interface ShareButtonProps {
   onCopied?: () => void;
   className?: string;
   label?: string;
+  shareUrl?: string;
 }
 
 /**
@@ -16,11 +17,13 @@ export function ShareButton({
   onCopied,
   className,
   label = "이 페이지 공유하기",
+  shareUrl,
 }: ShareButtonProps) {
   const handleShare = async () => {
     try {
       if (typeof window !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(window.location.href);
+        const targetUrl = shareUrl || window.location.href;
+        await navigator.clipboard.writeText(targetUrl);
       }
     } catch {
       /* 클립보드 예외 무시 */
