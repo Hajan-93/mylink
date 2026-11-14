@@ -35,6 +35,7 @@ export interface LinkItem {
   category?: string;        // 카테고리 (선택)
   order?: number;           // 정렬 순서 (선택)
   external?: boolean;       // 새 창 열기 여부 (선택)
+  clickCount?: number;      // 13주차: 링크 클릭수
 }
 
 // 2. 통합 콘텐츠 아이템 (섹션 헤더 or 링크 카드)
@@ -47,4 +48,5 @@ export interface ContentItem {
   url?: string;             // 링크 URL (type === "link" 일 때 필수)
   emoji?: string;           // 링크 카드 아이콘 이모지
   category?: string;        // 카테고리
+  clickCount?: number;      // 13주차: 링크 클릭수
 }

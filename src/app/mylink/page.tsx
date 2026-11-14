@@ -10,9 +10,10 @@ import {
   updateLinkInFirestore,
   deleteLinkFromFirestore,
   getUserProfileFromFirestore,
+  incrementLinkClickCount,
 } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
-import { AddLinkDialog, EditProfileDialog } from "@/components/profile";
+import { AddLinkDialog, EditProfileDialog, LinkAnalytics } from "@/components/profile";
 import { LoggedOutView } from "@/components/logged-out-view";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -119,6 +120,20 @@ export default function MyLinkPage() {
     } catch (error) {
       console.error("Firestore 삭제 실패:", error);
       showToast("링크 삭제에 실패했습니다.");
+    }
+  };
+
+  // 13주차: 링크 클릭 시 서버에서 +1 카운트 증가 & 실시간 통계 반영
+  const handleLinkClick = (id: string) => {
+    if (user?.uid) {
+      incrementLinkClickCount(user.uid, id);
+      setContents((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? { ...item, clickCount: (item.clickCount || 0) + 1 }
+            : item
+        )
+      );
     }
   };
 
@@ -291,11 +306,15 @@ export default function MyLinkPage() {
                   <ContentList
                     contents={contents}
                     canEdit={true}
+                    onClickLink={handleLinkClick}
                     onUpdateLink={handleUpdateLink}
                     onDeleteLink={handleDeleteLink}
                   />
                 )}
               </section>
+
+              {/* 13주차: 마이페이지 링크 클릭 통계 섹션 */}
+              <LinkAnalytics contents={contents} />
             </>
           )}
         </main>

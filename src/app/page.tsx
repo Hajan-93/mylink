@@ -10,6 +10,7 @@ import {
   addLinkToFirestore,
   getUserProfileFromFirestore,
   syncUserProfileToFirestore,
+  incrementLinkClickCount,
 } from "@/lib/firestore";
 import { ContentList } from "@/components/content-list";
 import {
@@ -91,6 +92,20 @@ export default function Home() {
       }
     };
   }, []);
+
+  // 링크 클릭 시 카운트 증가 처리 (13주차)
+  const handleLinkClick = (id: string) => {
+    if (user?.uid) {
+      incrementLinkClickCount(user.uid, id);
+      setContents((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? { ...item, clickCount: (item.clickCount || 0) + 1 }
+            : item
+        )
+      );
+    }
+  };
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -202,6 +217,7 @@ export default function Home() {
                   <ContentList
                     contents={contents}
                     canEdit={true}
+                    onClickLink={handleLinkClick}
                     onUpdateLink={handleUpdateLink}
                     onDeleteLink={handleDeleteLink}
                   />

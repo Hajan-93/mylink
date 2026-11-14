@@ -1,10 +1,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 1. 개인화 링크 목록 (11주차 & 12주차: 조회는 누구나, 수정은 본인만)
+    // 1. 개인화 링크 목록 (11~13주차)
+    // - 조회: 누구나 가능
+    // - 생성 및 삭제: 본인만 가능
+    // - 수정: 본인이거나, 방문자가 링크 클릭 카운트(clickCount)만 업데이트하는 경우 허용
     match /users/{userId}/links/{linkId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow create, delete: if request.auth != null && request.auth.uid == userId;
+      allow update: if (request.auth != null && request.auth.uid == userId)
+                    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clickCount']));
     }
 
     // 2. 프로필 정보 (12주차: 조회는 누구나, 수정은 본인만)

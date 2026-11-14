@@ -12,7 +12,7 @@ import {
   Sparkles,
   Link as LinkIcon,
 } from "lucide-react";
-import { getUserByUsername, getLinksFromFirestore } from "@/lib/firestore";
+import { getUserByUsername, getLinksFromFirestore, incrementLinkClickCount } from "@/lib/firestore";
 import { ProfileData, ContentItem } from "@/types";
 import { ProfileHeader } from "@/components/profile";
 import { useAuth } from "@/contexts/auth-context";
@@ -81,6 +81,21 @@ export default function UserPublicPage() {
       }
     } catch (e) {
       console.warn("클립보드 복사 실패:", e);
+    }
+  };
+
+  // 13주차 핵심 요구사항: 링크 클릭 시 서버에서 원자적으로 +1 증가 (동시성 해결)
+  const handleLinkClick = (linkId: string) => {
+    if (ownerUid) {
+      incrementLinkClickCount(ownerUid, linkId);
+      // 로컬 화면 상태 즉시 반영 (낙관적 업데이트)
+      setLinks((prev) =>
+        prev.map((item) =>
+          item.id === linkId
+            ? { ...item, clickCount: (item.clickCount || 0) + 1 }
+            : item
+        )
+      );
     }
   };
 
@@ -214,6 +229,7 @@ export default function UserPublicPage() {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleLinkClick(item.id)}
                   className="tds-pressed group flex items-center justify-between p-4 rounded-2xl bg-tds-bg-primary border border-tds-line-default shadow-sm hover:border-tds-fg-brand/40 hover:shadow-md transition-all text-left no-underline"
                 >
                   <div className="flex items-center gap-3 min-w-0 pr-2">

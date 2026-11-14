@@ -14,6 +14,7 @@ import {
   updateDoc,
   deleteDoc,
   limit,
+  increment,
 } from "firebase/firestore";
 import { ContentItem, ProfileData } from "@/types";
 
@@ -287,6 +288,7 @@ export async function addLinkToFirestore(
     url: item.url ?? null,
     desc: item.desc ?? null,
     emoji: item.emoji ?? "🔗",
+    clickCount: 0, // 13주차: 기본 클릭수 0 초기화
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -316,8 +318,30 @@ export async function getLinksFromFirestore(
       url: data.url ?? "",
       desc: data.desc ?? undefined,
       emoji: data.emoji ?? "🔗",
+      clickCount: typeof data.clickCount === "number" ? data.clickCount : 0, // 13주차: 클릭 카운트
     };
   });
+}
+
+/**
+ * 13주차 핵심 요구사항: 링크 클릭 시 서버에서 원자적으로 +1 증가 (동시성 문제 해결)
+ * Firestore increment(1)을 사용하여 여러 사용자가 동시에 클릭해도 손실 없이 카운트
+ */
+export async function incrementLinkClickCount(
+  userId: string,
+  linkId: string
+): Promise<void> {
+  if (!userId || !linkId) return;
+
+  try {
+    const linkDocRef = doc(db, "users", userId, "links", linkId);
+    await updateDoc(linkDocRef, {
+      clickCount: increment(1),
+    });
+  } catch (error) {
+    // 13주차 AI 프롬프트 예시 요구: 실패 시 콘솔 에러
+    console.error("클릭 카운트 증가 실패:", error);
+  }
 }
 
 /**

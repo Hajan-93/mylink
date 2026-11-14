@@ -31,6 +31,8 @@ export interface LinkCardProps {
   external?: boolean;
   className?: string;
   canEdit?: boolean;
+  clickCount?: number; // 13주차: 클릭 카운트
+  onClickLink?: (id: string) => void;
   onDelete?: (id: string) => Promise<void> | void;
   onUpdate?: (id: string, updated: { title: string; url: string }) => Promise<void> | void;
 }
@@ -49,6 +51,8 @@ export function LinkCard({
   external = true,
   className,
   canEdit = false,
+  clickCount,
+  onClickLink,
   onDelete,
   onUpdate,
 }: LinkCardProps) {
@@ -332,11 +336,20 @@ export function LinkCard({
           href={url}
           target={external ? "_blank" : undefined}
           rel={external ? "noopener noreferrer" : undefined}
+          onClick={() => onClickLink?.(id)}
           className="flex flex-col gap-0.5 min-w-0 flex-1 no-underline"
         >
-          <span className="text-[15px] font-semibold text-tds-fg-primary truncate leading-snug group-hover:text-tds-fg-brand transition-colors">
-            {title}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[15px] font-semibold text-tds-fg-primary truncate leading-snug group-hover:text-tds-fg-brand transition-colors">
+              {title}
+            </span>
+            {/* 13주차: 각 링크별 클릭수 뱃지 표시 */}
+            {typeof clickCount === "number" && (
+              <span className="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 tabular-nums">
+                {clickCount.toLocaleString()} 클릭
+              </span>
+            )}
+          </div>
           {desc ? (
             <span className="text-[13px] text-tds-fg-tertiary truncate leading-normal">
               {desc}

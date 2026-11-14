@@ -7,6 +7,7 @@ import { LinkCard, SectionHeader } from "./profile";
 interface ContentListProps {
   contents: ContentItem[];
   canEdit?: boolean;
+  onClickLink?: (id: string) => void;
   onDeleteLink?: (id: string) => void;
   onUpdateLink?: (id: string, updated: { title: string; url: string }) => Promise<void> | void;
 }
@@ -14,7 +15,13 @@ interface ContentListProps {
 /**
  * 정렬된 통합 콘텐츠(섹션 및 링크 카드) 목록 렌더링 컴포넌트
  */
-export function ContentList({ contents, canEdit = false, onDeleteLink, onUpdateLink }: ContentListProps) {
+export function ContentList({
+  contents,
+  canEdit = false,
+  onClickLink,
+  onDeleteLink,
+  onUpdateLink,
+}: ContentListProps) {
   if (!contents || contents.length === 0) {
     return (
       <div className="py-12 text-center text-[14px] text-tds-fg-tertiary">
@@ -48,6 +55,8 @@ export function ContentList({ contents, canEdit = false, onDeleteLink, onUpdateL
             url={item.url || "#"}
             desc={item.desc}
             emoji={item.emoji}
+            clickCount={item.clickCount}
+            onClickLink={onClickLink}
             external={true}
             canEdit={canEdit}
             onDelete={onDeleteLink}
